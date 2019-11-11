@@ -1,0 +1,89 @@
+
+model_2 <- application_vgg16(weights = "imagenet", include_top = TRUE) # # Pretrained Imagenet Model
+model_2
+
+model <- load_model_hdf5("fruits_checkpoinds.h5") # previous model for training and validating the data
+model
+
+test_image_file_path <- "/home/liam_local/Documents/Machine_learning/Fruit-Images-Dataset-master/Test"
+
+img <- image_read('https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Banana-Single.jpg/272px-Banana-Single.jpg') # load banana image
+img_path <- file.path(test_image_file_path, "Banana", "banana.jpg") # set path for banana
+image_write(img, img_path) # write the image 
+
+img2 <- image_read('https://cdn.pixabay.com/photo/2010/12/13/09/51/clementine-1792_1280.jpg')
+img_path2 <- file.path(test_image_file_path, "Clementine", "clementine.jpg")
+image_write(img2, img_path2)
+
+plot_superpixels(img_path, n_superpixels = 35, weight = 10)
+plot_superpixels(img_path2, n_superpixels = 50, weight = 20)
+
+## Function to Prepare images for imagenet ##
+image_prep <- function(x) {
+  arrays <- lapply(x, function(path) {
+  img <- image_load(path, target_size = c(224, 224))
+  x = image_to_array(img)
+  x = array_reshape(x, c(1, dim(x)))
+  x <- imagenet_preprocess_input(x)
+  })
+do.call(abind::abind, c(arrays, list(along = 1)))
+}
+
+# Test predictions
+res <- predict(model_2, image_prep(c(img_path, img_path2)))
+imagenet_decode_predictions(res)
+
+## Load labels and train explainer
+model_labels <- readRDS(system.file('extdata', 'imagenet_labels.rds', package = 'lime'))
+explainer <- lime(c(img_path, img_path2), as_classifier(model_2, model_labels), image_prep) # uses function to build explainer| for models of imagenet
+
+explanation <- explain(c(img_path, img_path2), explainer, n_labels = 2, n_features = 35, n_superpixels = 35,
+                       weight = 10, background = "white")
+plot_image_explanation(explanation) # plot image with explanation
+clementine <- explanation[explanation$case == "clementine.jpg",] 
+
+plot_image_explanation(clementine)
+
+########################################
+##### PREPARE IMAGES FROM BUILT MODEL ##
+
+test_datagen <- image_data_generator(rescale = 1/255)
+test_generator <- flow_images_from_directory(
+  test_image_file_path, test_datagen, target_size = c(20, 20),
+  class_mode = "categorical"
+)
+
+predictions <- as.data.frame(predict_generator(model, test_generator, steps = 1))
+
+load("fruits_classes_indices.RData")
+fruits_classes_indices_df <- data.frame(indices = unlist(fruits_classes_indices))
+fruits_classes_indices_df <- fruits_classes_indices_df[order(fruits_classes_indices_df$indices),, drop = FALSE]
+colnames(predictions) <- rownames(fruits_classes_indices_df)
+t(round(predictions, digits = 2))
+
+for (i in 1:nrow(predictions)) {
+  cat(i, ":")
+  print(unlist(which.max(predictions[i,]))) # lists the top categories and how many of them there are
+}
+
+image_prep2 <- function(x) { # function to prepare images like imagenet but for current data
+  arrays <- lapply(x, function(path){
+    img <- image_load(path, target_size = c(20, 20))
+    x <- image_to_array(img)
+    x <- reticulate::array_reshape(x, c(1, dim(x)))
+    x <- x/255
+  })
+  do.call(abind::abind, c(arrays, list(along=1)))
+}
+
+# labels
+fruits_classes_indices_1 <- rownames(fruits_classes_indices_df)
+names(fruits_classes_indices_1) <- unlist(fruits_classes_indices)
+fruits_classes_indices_1 # names are unlisted
+
+## TRAIN EXPLAINER
+explainer2 <- lime(c(img_path, img_path2), as_classifier(model, fruits_classes_indices_1), image_prep2)
+explanation2 <- explain(c(img_path, img_path2), explainer2,
+                        n_labels = 1, n_features = 20, n_superpixes = 45, weight = 10,
+                        backgroud = "white")
+explanation2
