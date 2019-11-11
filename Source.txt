@@ -1,0 +1,12 @@
+﻿Tutorial for Maching Learning using Fruit images
+Includes the use of ‘Lime’ and ‘Magick packages’
+
+Source: Shirin’s Playground
+
+https://shirinsplayground.netlify.com/2018/06/keras_fruits/ [Tutorial 1]
+https://shirinsplayground.netlify.com/2018/06/keras_fruits_lime/ [Tutorial 2]
+
+
+
+
+
