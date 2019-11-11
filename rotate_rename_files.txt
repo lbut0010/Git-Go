@@ -1,10 +1,11 @@
-﻿To rotate images by 90 degrees (anticlockwise)
+﻿#!/bin/bash
+# This script rotates and renames files
 
+# To rotate images by 90 degrees (anticlockwise)
 for file in *.JPG; do convert $file -rotate -90 rotated-$file; done
 
 
-To rename files sequentially:
-
+# To rename files sequentially:
 a=1
 for i in *.jpg; do
   new=$(printf "%04d.jpg" "$a") #04 pad to length of 4
