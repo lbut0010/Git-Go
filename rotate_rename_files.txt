@@ -1,0 +1,16 @@
+﻿To rotate images by 90 degrees (anticlockwise)
+
+for file in *.JPG; do convert $file -rotate -90 rotated-$file; done
+
+
+To rename files sequentially:
+
+a=1
+for i in *.jpg; do
+  new=$(printf "%04d.jpg" "$a") #04 pad to length of 4
+  mv -i -- "$i" "$new"
+  let a=a+1
+done
+
+
+
