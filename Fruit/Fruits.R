@@ -1,8 +1,8 @@
 library(tidyverse)
 library(keras) # for working with neural networks
-install.packages("lime") # for explaining models
+# install.packages("lime") # for explaining models
 library(lime)
-install.packages("magick")
+# install.packages("magick")
 library(magick)
 library(ggplot2)
 
