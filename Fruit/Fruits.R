@@ -17,6 +17,7 @@ target_size <- c(img_width, img_height)
 channels <- 3 # 3 RGB Channels
 
 #Path to image folders
+# This will need changing once images ready
 train_image_files_path <- "/home/liam_local/Documents/Machine_learning/Fruit-Images-Dataset-master/Training"
 valid_image_files_path <- "/home/liam_local/Documents/Machine_learning/Fruit-Images-Dataset-master/Validation"
 
