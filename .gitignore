@@ -4,3 +4,4 @@
 .Ruserdata
 images/model.h5
 images/yolov3.weights
+images/*.swp

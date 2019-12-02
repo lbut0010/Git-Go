@@ -243,7 +243,11 @@ draw_boxes(photo_filename, v_boxes, v_labels, v_scores)
 #tiny = orig_img[y1:y2, x1:x2, 0:3 ]
 #pyplot.imshow(tiny)
 #pyplot.show()
+orig_img = pyplot.imread(photo_filename)
 for i in range(len(v_boxes)):
         box = v_boxes[i]
         y1, x1, y2, x2 = box.ymin, box.xmin, box.ymax, box.xmax
         print(y1, x1, y2, x2)
+        sub_img = orig_img[y1:y2, x1:x2, 0:3]
+        pyplot.imshow(sub_img)
+        pyplot.show()
