@@ -13,6 +13,7 @@ from keras.preprocessing.image import load_img
 from keras.preprocessing.image import img_to_array
 from matplotlib import pyplot
 from matplotlib.patches import Rectangle
+from os import listdir
 
 class BoundBox:
 	def __init__(self, xmin, ymin, xmax, ymax, objness = None, classes = None):
@@ -222,27 +223,6 @@ draw_boxes(photo_filename, v_boxes, v_labels, v_scores)
 # print(len(v_boxes))
 
 # Try to cut out the image
-#box = v_boxes[0]
-# get coordinates
-#y1, x1, y2, x2 = box.ymin, box.xmin, box.ymax, box.xmax
-#print(y1, x1, y2, x2)
-# calculate width and height of the box
-#width, height = x2 - x1, y2 - y1
-#orig_img = pyplot.imread(photo_filename)
-#pyplot.imshow(orig_img)
-#pyplot.show()
-#print(type(orig_img))
-#print(orig_img.shape)
-#print(orig_img.size)
-#print(orig_img.shape[0]) # height
-#print(orig_img.shape[1]) # width
-#print(orig_img.shape[2]) # depth; 3 for RGB
-#tiny = orig_img.crop(y1, x1, y2, x2)
-# next line top:bottom, left:right, RGB
-#tiny = orig_img[859:2776, 640:2448, 0:3 ]
-#tiny = orig_img[y1:y2, x1:x2, 0:3 ]
-#pyplot.imshow(tiny)
-#pyplot.show()
 orig_img = pyplot.imread(photo_filename)
 for i in range(len(v_boxes)):
         box = v_boxes[i]
@@ -251,3 +231,16 @@ for i in range(len(v_boxes)):
         sub_img = orig_img[y1:y2, x1:x2, 0:3]
         pyplot.imshow(sub_img)
         pyplot.show()
+
+# Check the listdir works ok
+loaded_images = list()
+for filename in listdir('jpg'):
+        # Load and display images
+        img_data = pyplot.imread('jpg/' + filename)
+        # Store loaded image
+        loaded_images.append(img_data)
+        print(filename)
+
+for i in range(len(loaded_images)):
+    pyplot.imshow(loaded_images[i])
+    pyplot.show()
