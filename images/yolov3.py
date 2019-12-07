@@ -2,7 +2,8 @@
 # based on https://github.com/experiencor/keras-yolo3
 
 # Code taken from:
-# https://machinelearningmastery.com/how-to-perform-object-detection-with-yolov3-in-keras/ on 1st December 2019
+# https://machinelearningmastery.com/how-to-perform-object-detection-with-yolov3
+# -in-keras/ on 1st December 2019
 
 
 
@@ -15,6 +16,7 @@ from matplotlib import pyplot
 from matplotlib.patches import Rectangle
 from os import listdir
 
+#%% Setup BoundBox class
 class BoundBox:
 	def __init__(self, xmin, ymin, xmax, ymax, objness = None, classes = None):
 		self.xmin = xmin
@@ -38,14 +40,15 @@ class BoundBox:
 
 		return self.score
 
+# %% sigmoid
 def _sigmoid(x):
 	return 1. / (1. + np.exp(-x))
 
+# %% decode_netout
 def decode_netout(netout, anchors, obj_thresh, net_h, net_w):
 	grid_h, grid_w = netout.shape[:2]
 	nb_box = 3
 	netout = netout.reshape((grid_h, grid_w, nb_box, -1))
-	nb_class = netout.shape[-1] - 5
 	boxes = []
 	netout[..., :2]  = _sigmoid(netout[..., :2])
 	netout[..., 4:]  = _sigmoid(netout[..., 4:])
@@ -71,6 +74,7 @@ def decode_netout(netout, anchors, obj_thresh, net_h, net_w):
 			boxes.append(box)
 	return boxes
 
+# %% correct_yolo_boxes
 def correct_yolo_boxes(boxes, image_h, image_w, net_h, net_w):
 	new_w, new_h = net_w, net_h
 	for i in range(len(boxes)):
@@ -81,6 +85,7 @@ def correct_yolo_boxes(boxes, image_h, image_w, net_h, net_w):
 		boxes[i].ymin = int((boxes[i].ymin - y_offset) / y_scale * image_h)
 		boxes[i].ymax = int((boxes[i].ymax - y_offset) / y_scale * image_h)
 
+# %% interval_overlap
 def _interval_overlap(interval_a, interval_b):
 	x1, x2 = interval_a
 	x3, x4 = interval_b
@@ -95,6 +100,7 @@ def _interval_overlap(interval_a, interval_b):
 		else:
 			return min(x2,x4) - x3
 
+# %% bbox_iou
 def bbox_iou(box1, box2):
 	intersect_w = _interval_overlap([box1.xmin, box1.xmax], [box2.xmin, box2.xmax])
 	intersect_h = _interval_overlap([box1.ymin, box1.ymax], [box2.ymin, box2.ymax])
@@ -104,6 +110,7 @@ def bbox_iou(box1, box2):
 	union = w1*h1 + w2*h2 - intersect
 	return float(intersect) / union
 
+# %% do_nms
 def do_nms(boxes, nms_thresh):
 	if len(boxes) > 0:
 		nb_class = len(boxes[0].classes)
@@ -119,6 +126,7 @@ def do_nms(boxes, nms_thresh):
 				if bbox_iou(boxes[index_i], boxes[index_j]) >= nms_thresh:
 					boxes[index_j].classes[c] = 0
 
+# %% main section
 # load and prepare an image
 def load_image_pixels(filename, shape):
 	# load the image to get its shape
