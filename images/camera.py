@@ -62,7 +62,7 @@ v_boxes, v_labels, v_scores = yolo.get_boxes(boxes, labels, class_threshold)
 for i in range(len(v_boxes)):
     print(v_labels[i], v_scores[i])
 # draw what we found
-yolo.draw_boxes(photo_filename, v_boxes, v_labels, v_scores)
+# yolo.draw_boxes(photo_filename, v_boxes, v_labels, v_scores)
 # The length of v_boxes tells me how many objects have been identified
 # print(len(v_boxes))
 
