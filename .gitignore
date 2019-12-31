@@ -6,3 +6,5 @@ images/model.h5
 images/yolov3.weights
 images/*.swp
 images/__pycache__
+images/jpg/*
+images/original_test
